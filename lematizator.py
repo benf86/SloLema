@@ -41,7 +41,10 @@ def get_nominative(word):
                     return base_form
                 elif word in dictionary:
                     return word
-    return False
+    return word
 
-if sys.argv[1]:
-    print get_nominative(sys.argv[1])
+if len(sys.argv) > 1:
+    for arg in sys.argv[1:]:
+        out = get_nominative(arg)
+        if out:
+            print out
