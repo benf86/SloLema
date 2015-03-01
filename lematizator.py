@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-
-import re
 import sys
 
 noun_suffixes = {
@@ -17,18 +15,17 @@ noun_suffixes = {
 }
 
 dictionary = []
-with open('sbsj.html') as f:
+with open('dictionary.txt') as f:
     for line in f.readlines():
         dictionary.append(line.split()[0].strip().lower())
-
 dictionary = set(dictionary)
 
 
 def get_nominative(word):
     word = word.strip().lower()
-    if word in dictionary:
-        return word
-    elif len(word) > 3:
+    if len(word) > 3:
+        if word in dictionary:
+            return word
         for name, declension in noun_suffixes.iteritems():
             suffixes = declension[0]
             suffixes.sort(key=len, reverse=True)
@@ -44,29 +41,7 @@ def get_nominative(word):
                     return base_form
                 elif word in dictionary:
                     return word
+    return False
 
-if len(sys.argv) == 1:
-    test_words = ''
-    with open('testtext.txt') as f:
-        for line in f.readlines():
-            test_words += re.sub(r'["|,|:|!|.|;]+', ' ', line)
-
-    success = 0
-    failure = 0
-    failures = []
-    for word in test_words.split():
-        returned = get_nominative(word)
-        if type(returned) is str:
-            success += 1
-        else:
-            failure += 1
-            failures.append(word)
-
-    print failures
-
-    print 'Successes: {}\nFailures: {}\nTotal: {}'.format(success, failure,
-                                                          success + failure)
-
-else:
-    for arg in sys.argv[1:]:
-        print get_nominative(arg)
+if sys.argv[1]:
+    print get_nominative(sys.argv[1])
