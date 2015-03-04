@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
+import re
 
 noun_suffixes = {
     'moska_1': (
@@ -22,6 +23,7 @@ dictionary = set(dictionary)
 
 
 def get_nominative(word):
+    word = re.sub(r'["|,|:|!|?|.|;|\'|(|)|\\|/]+', ' ', word)
     word = word.strip().lower()
     if len(word) > 3:
         if word in dictionary:
@@ -41,10 +43,34 @@ def get_nominative(word):
                     return base_form
                 elif word in dictionary:
                     return word
-    return word
+    return False, word
 
+success = 0
+fail = 0
 if len(sys.argv) > 1:
     for arg in sys.argv[1:]:
         out = get_nominative(arg)
-        if out:
+        if type(out) is str:
             print out
+            success += 1
+        else:
+            print 'Not found: ', out[1]
+            fail += 1
+
+else:
+    with open('i.txt') as f:
+        for line in f.readlines():
+            for word in line.split():
+                out = get_nominative(word)
+            if type(out) is str:
+                print out
+                success += 1
+            else:
+                print 'Not found: ', out[1]
+                fail += 1
+
+print '200: ', success
+print '404: ', fail
+total = success + fail
+pc = success *100 / total
+print 'Total: ', total, ' == ', pc, '%'
